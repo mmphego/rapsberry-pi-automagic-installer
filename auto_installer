@@ -1,0 +1,41 @@
+#!/bin/bash
+
+apt_installer(){
+	sudo apt-get update -qq
+	sudo apt-get install -qy $(cat apt-requirement.txt)
+	sudo apt-get dist-upgrade --force-yes
+}
+
+#
+pip_installer(){
+	[ -f get-pip.py ] || wget -O get-pip.py https://bootstrap.pypa.io/get-pip.py
+	[ -f $(which pip) ] || sudo $(which python) get-pip.py
+	sudo $(which pip) install --no-cache-dir virtualenv
+}
+
+node_installer(){
+	echo "Y" | bash <(curl -sL https://raw.githubusercontent.com/node-red/raspbian-deb-package/master/resources/update-nodejs-and-nodered)
+	sudo systemctl enable nodered.service
+	node-red-stop
+}
+
+nodered_installer(){
+	mkdir -p /home/pi/.node-red && cd "$_"
+	sudo npm i node-red-dashboard
+	node-red-start
+}
+
+pip_package_installer_virtual(){
+	mkdir -p /home/$USER/.home_virt
+	virtualenv --no-site-packages /home/$USER/.home_virt
+	. /home/$USER/.home_virt/bin/activate
+	#pip install -U --no-cache-dir -r pip-requirements.txt
+	pip install -U -r pip-requirements.txt
+        echo 'source /home/$USER/.home_virt/bin/activate' >> /home/$USER/.bashrc
+}
+
+apt_installer
+pip_installer
+pip_package_installer_virtual
+node_installer
+nodered_installer
