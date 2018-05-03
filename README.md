@@ -1,1 +1,1 @@
-# rapsberry-pi-automagic-installer
+# rpi-automagic-installer
